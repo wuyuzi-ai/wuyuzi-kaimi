@@ -1,666 +1,566 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
-<meta name="theme-color" content="#080b16">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#080b16" />
+  <title>无雨子 · 卡密验证系统中心</title>
 
-<title>无雨子 · 卡密验证中心</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-<style>
-*{
-  box-sizing:border-box;
-}
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(80, 100, 255, 0.18), transparent 35%),
+        radial-gradient(circle at 80% 80%, rgba(180, 60, 255, 0.15), transparent 35%),
+        #080b16;
+      color: #fff;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Microsoft YaHei",
+        sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow: hidden;
+    }
 
-html,body{
-  margin:0;
-  min-height:100%;
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    "Microsoft YaHei",
-    sans-serif;
-}
+    .container {
+      width: 100%;
+      max-width: 430px;
+    }
 
-body{
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:24px 16px;
-  color:#fff;
-  background:#080b16;
-  overflow-x:hidden;
-  position:relative;
-}
+    .brand {
+      text-align: center;
+      margin-bottom: 22px;
+    }
 
-/* 背景光晕 */
-body::before,
-body::after{
-  content:"";
-  position:fixed;
-  border-radius:50%;
-  filter:blur(70px);
-  opacity:.35;
-  pointer-events:none;
-}
+    .brand-name {
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      background: linear-gradient(90deg, #8ea2ff, #d18cff);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
 
-body::before{
-  width:260px;
-  height:260px;
-  background:#635bff;
-  top:-80px;
-  left:-80px;
-}
+    .brand-sub {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #77809b;
+      letter-spacing: 3px;
+    }
 
-body::after{
-  width:300px;
-  height:300px;
-  background:#00b8ff;
-  right:-120px;
-  bottom:-100px;
-}
+    .card {
+      background: rgba(18, 23, 40, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 28px 22px;
+      box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.45),
+        inset 0 1px rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(18px);
+    }
 
-.wrap{
-  width:100%;
-  max-width:430px;
-  position:relative;
-  z-index:1;
-}
+    .icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 20px;
+      margin: 0 auto 18px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 30px;
+      background: linear-gradient(135deg, #5068ff, #a44cff);
+      box-shadow: 0 10px 35px rgba(90, 80, 255, 0.35);
+    }
 
-/* 顶部品牌 */
-.top{
-  text-align:center;
-  margin-bottom:18px;
-}
+    h1 {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
 
-.brand{
-  display:inline-flex;
-  align-items:center;
-  gap:9px;
-  font-weight:800;
-  font-size:15px;
-  letter-spacing:1px;
-}
+    .desc {
+      text-align: center;
+      color: #7e879e;
+      font-size: 13px;
+      margin-bottom: 24px;
+    }
 
-.brand-mark{
-  width:34px;
-  height:34px;
-  border-radius:11px;
-  display:grid;
-  place-items:center;
-  background:linear-gradient(135deg,#7c6cff,#00cfff);
-  box-shadow:0 8px 25px rgba(74,107,255,.35);
-}
+    .input-wrap {
+      position: relative;
+      margin-bottom: 14px;
+    }
 
-.sub{
-  margin-top:9px;
-  color:#8f98ad;
-  font-size:12px;
-}
+    input {
+      width: 100%;
+      height: 54px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      outline: none;
+      background: rgba(255, 255, 255, 0.055);
+      color: white;
+      padding: 0 48px 0 16px;
+      font-size: 15px;
+      transition: 0.25s;
+    }
 
-/* 主卡片 */
-.card{
-  padding:28px 22px 20px;
-  border:1px solid rgba(255,255,255,.09);
-  border-radius:26px;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(24,29,48,.92),
-      rgba(13,17,30,.96)
-    );
-  box-shadow:
-    0 25px 80px rgba(0,0,0,.45);
-  backdrop-filter:blur(18px);
-}
+    input:focus {
+      border-color: #7182ff;
+      box-shadow: 0 0 0 3px rgba(113, 130, 255, 0.12);
+    }
 
-.badge{
-  display:inline-flex;
-  padding:6px 10px;
-  border-radius:999px;
-  background:rgba(124,108,255,.12);
-  color:#a9a0ff;
-  font-size:11px;
-  font-weight:700;
-}
+    input::placeholder {
+      color: #59627b;
+    }
 
-h1{
-  font-size:28px;
-  margin:13px 0 7px;
-  letter-spacing:-.5px;
-}
+    .clear {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 0;
+      background: transparent;
+      color: #737c96;
+      font-size: 18px;
+      cursor: pointer;
+    }
 
-.desc{
-  color:#8f98ad;
-  font-size:13px;
-  margin-bottom:22px;
-}
+    .submit {
+      width: 100%;
+      height: 54px;
+      border: 0;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #566cff, #a04cff);
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 12px 30px rgba(93, 76, 255, 0.28);
+      transition: 0.2s;
+    }
 
-/* 输入框 */
-.field{
-  position:relative;
-}
+    .submit:active {
+      transform: scale(0.98);
+    }
 
-.input{
-  width:100%;
-  height:56px;
-  padding:0 46px 0 16px;
-  border-radius:15px;
-  border:1px solid #2b3247;
-  outline:none;
-  background:#0a0e1a;
-  color:#fff;
-  font-size:15px;
-  transition:.2s;
-}
+    .tip {
+      text-align: center;
+      color: #59627b;
+      font-size: 11px;
+      margin-top: 16px;
+    }
 
-.input::placeholder{
-  color:#596277;
-}
+    /* 扫描页面 */
 
-.input:focus{
-  border-color:#766bff;
-  box-shadow:
-    0 0 0 4px rgba(118,107,255,.12);
-}
+    .scan-card {
+      display: none;
+    }
 
-/* 清除按钮 */
-.clear{
-  display:none;
-  position:absolute;
-  right:12px;
-  top:14px;
-  width:28px;
-  height:28px;
-  border:0;
-  border-radius:50%;
-  background:#222a3c;
-  color:#aeb6c8;
-  cursor:pointer;
-}
+    .scan-icon {
+      width: 76px;
+      height: 76px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: rgba(88, 105, 255, 0.12);
+      border: 1px solid rgba(110, 125, 255, 0.25);
+      position: relative;
+    }
 
-/* 验证按钮 */
-.btn{
-  width:100%;
-  height:54px;
-  margin-top:13px;
-  border:0;
-  border-radius:15px;
-  color:#fff;
-  font-size:15px;
-  font-weight:800;
-  background:
-    linear-gradient(
-      135deg,
-      #766bff,
-      #18bfff
-    );
-  box-shadow:
-    0 12px 28px rgba(83,106,255,.25);
-  cursor:pointer;
-  transition:.2s;
-}
+    .scan-icon::before {
+      content: "";
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      border-top-color: #7081ff;
+      animation: rotate 1s linear infinite;
+    }
 
-.btn:active{
-  transform:scale(.985);
-}
+    .scan-icon span {
+      font-size: 30px;
+    }
 
-.btn:disabled{
-  opacity:.65;
-  cursor:default;
-}
+    @keyframes rotate {
+      to {
+        transform: rotate(360deg);
+      }
+    }
 
-/* 进度 */
-.progress-box{
-  display:none;
-  margin-top:20px;
-}
+    .scan-title {
+      text-align: center;
+      font-size: 21px;
+      font-weight: 700;
+      margin-bottom: 22px;
+    }
 
-.progress-line{
-  display:flex;
-  justify-content:space-between;
-  color:#9ca6bb;
-  font-size:12px;
-  margin-bottom:9px;
-}
+    .status-box {
+      min-height: 58px;
+      border-radius: 14px;
+      padding: 17px;
+      background: rgba(255, 255, 255, 0.045);
+      color: #b9c0d4;
+      font-size: 13px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-.progress{
-  height:7px;
-  background:#20273a;
-  border-radius:99px;
-  overflow:hidden;
-}
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #6f82ff;
+      box-shadow: 0 0 12px #6f82ff;
+      flex-shrink: 0;
+      animation: blink 0.8s infinite alternate;
+    }
 
-.bar{
-  height:100%;
-  width:0;
-  background:
-    linear-gradient(
-      90deg,
-      #766bff,
-      #18bfff
-    );
-  border-radius:99px;
-  transition:width .18s;
-}
+    @keyframes blink {
+      from {
+        opacity: 0.35;
+      }
+      to {
+        opacity: 1;
+      }
+    }
 
-/* 结果 */
-.result{
-  display:none;
-  margin-top:20px;
-  padding:22px 14px;
-  text-align:center;
-  border-radius:18px;
-  background:rgba(255,196,72,.07);
-  border:1px solid rgba(255,196,72,.2);
-}
+    .progress-wrap {
+      margin-bottom: 8px;
+    }
 
-.result-icon{
-  font-size:45px;
-  animation:bounce .8s ease;
-}
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      color: #737d98;
+      font-size: 11px;
+      margin-bottom: 8px;
+    }
 
-.result-title{
-  margin-top:8px;
-  font-size:22px;
-  font-weight:900;
-  color:#ffd36a;
-}
+    .progress {
+      width: 100%;
+      height: 7px;
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 99px;
+      overflow: hidden;
+    }
 
-.result-text{
-  margin-top:7px;
-  color:#aeb6c8;
-  font-size:13px;
-}
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #5d74ff, #bc61ff);
+      transition: width 0.25s ease;
+      box-shadow: 0 0 15px rgba(113, 100, 255, 0.7);
+    }
 
-/* 提示 */
-.tip{
-  display:flex;
-  gap:8px;
-  margin-top:16px;
-  padding:11px 12px;
-  border-radius:12px;
-  background:#101526;
-  color:#69748a;
-  font-size:11px;
-  line-height:1.6;
-}
+    /* 最终页面 */
 
-.dot{
-  color:#18bfff;
-}
+    .result-card {
+      display: none;
+      text-align: center;
+    }
 
-/* 底部 */
-.footer{
-  margin-top:18px;
-  text-align:center;
-  color:#586176;
-  font-size:11px;
-}
+    .result-icon {
+      font-size: 58px;
+      margin-bottom: 12px;
+      animation: pop 0.6s ease;
+    }
 
-/* 动画 */
-@keyframes bounce{
-  0%{
-    transform:scale(.6);
-    opacity:.2;
-  }
+    @keyframes pop {
+      0% {
+        transform: scale(0);
+        opacity: 0;
+      }
+      70% {
+        transform: scale(1.15);
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
 
-  70%{
-    transform:scale(1.12);
-  }
+    .result-title {
+      font-size: 34px;
+      font-weight: 900;
+      margin-bottom: 12px;
+      background: linear-gradient(90deg, #7e8fff, #d76dff);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
 
-  100%{
-    transform:scale(1);
-    opacity:1;
-  }
-}
+    .result-sub {
+      color: #8c95aa;
+      font-size: 13px;
+      line-height: 1.8;
+    }
 
-/* 手机小屏 */
-@media(max-width:360px){
+    .restart {
+      margin-top: 24px;
+      width: 100%;
+      height: 48px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      background: rgba(255, 255, 255, 0.045);
+      color: #aeb6cb;
+      cursor: pointer;
+    }
 
-  .card{
-    padding:24px 16px 18px;
-  }
+    @media (max-width: 380px) {
+      .card {
+        padding: 24px 18px;
+      }
 
-  h1{
-    font-size:25px;
-  }
-
-}
-</style>
+      .result-title {
+        font-size: 30px;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="wrap">
-
-  <!-- 顶部 -->
-  <div class="top">
+  <div class="container">
 
     <div class="brand">
+      <div class="brand-name">无雨子</div>
+      <div class="brand-sub">WUYUZI · VERIFICATION CENTER</div>
+    </div>
 
-      <div class="brand-mark">
-        雨
+    <!-- 第一页：卡密验证 -->
+    <div class="card verify-card" id="verifyCard">
+
+      <div class="icon">🔐</div>
+
+      <h1>卡密验证</h1>
+
+      <div class="desc">
+        请输入您的卡密完成身份验证
       </div>
 
-      <span>
-        无雨子
-      </span>
+      <div class="input-wrap">
+        <input
+          id="keyInput"
+          type="text"
+          placeholder="请输入卡密"
+          autocomplete="off"
+        />
+
+        <button class="clear" id="clearBtn">×</button>
+      </div>
+
+      <button class="submit" id="submitBtn">
+        立即验证
+      </button>
+
+      <div class="tip">
+        ● 验证服务运行正常
+      </div>
 
     </div>
 
-    <div class="sub">
-      WUYUZI · 验证中心
+
+    <!-- 第二页：假装扫描 -->
+    <div class="card scan-card" id="scanCard">
+
+      <div class="scan-icon">
+        <span>🛡️</span>
+      </div>
+
+      <div class="scan-title">
+        正在进行安全验证
+      </div>
+
+      <div class="status-box">
+        <div class="status-dot"></div>
+        <div id="statusText">
+          正在建立安全连接...
+        </div>
+      </div>
+
+      <div class="progress-wrap">
+
+        <div class="progress-top">
+          <span>检测进度</span>
+          <span id="progressText">0%</span>
+        </div>
+
+        <div class="progress">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+      </div>
+
     </div>
 
-  </div>
 
+    <!-- 第三页：最终结果 -->
+    <div class="card result-card" id="resultCard">
 
-  <!-- 主卡片 -->
-  <div class="card">
+      <div class="result-icon">
+        😎
+      </div>
 
-    <span class="badge">
-      安全验证
-    </span>
+      <div class="result-title">
+        北101豪哥NB
+      </div>
 
-    <h1>
-      卡密验证
-    </h1>
+      <div class="result-sub">
+        验证完成<br>
+        本次检测已结束
+      </div>
 
-    <div class="desc">
-      请输入卡密，验证你的授权状态
-    </div>
-
-
-    <!-- 输入框 -->
-    <div class="field">
-
-      <input
-        id="key"
-        class="input"
-        type="text"
-        placeholder="请输入你的卡密"
-        autocomplete="off"
-      >
-
-      <button
-        id="clear"
-        class="clear"
-        type="button"
-      >
-        ×
+      <button class="restart" id="restartBtn">
+        再玩一次
       </button>
 
     </div>
 
-
-    <!-- 验证按钮 -->
-    <button
-      id="btn"
-      class="btn"
-      type="button"
-    >
-      立即验证
-    </button>
-
-
-    <!-- 验证进度 -->
-    <div
-      id="progressBox"
-      class="progress-box"
-    >
-
-      <div class="progress-line">
-
-        <span id="progressText">
-          准备验证...
-        </span>
-
-        <span id="percent">
-          0%
-        </span>
-
-      </div>
-
-      <div class="progress">
-
-        <div
-          id="bar"
-          class="bar"
-        ></div>
-
-      </div>
-
-    </div>
-
-
-    <!-- 最终结果 -->
-    <div
-      id="result"
-      class="result"
-    >
-
-      <div class="result-icon">
-        😂
-      </div>
-
-      <div class="result-title">
-        恭喜你！
-      </div>
-
-      <div class="result-text">
-        成功被骗了！
-      </div>
-
-    </div>
-
-
-    <!-- 娱乐提示 -->
-    <div class="tip">
-
-      <span class="dot">
-        ●
-      </span>
-
-      <span>
-        本页面仅用于娱乐演示，不会读取或保存你的真实账号信息。
-      </span>
-
-    </div>
-
   </div>
 
 
-  <div class="footer">
-    无雨子 · 卡密验证系统
-  </div>
+  <script>
 
-</div>
+    const verifyCard = document.getElementById("verifyCard");
+    const scanCard = document.getElementById("scanCard");
+    const resultCard = document.getElementById("resultCard");
 
+    const keyInput = document.getElementById("keyInput");
+    const clearBtn = document.getElementById("clearBtn");
+    const submitBtn = document.getElementById("submitBtn");
 
-<script>
+    const statusText = document.getElementById("statusText");
+    const progressBar = document.getElementById("progressBar");
+    const progressText = document.getElementById("progressText");
 
-const key =
-  document.getElementById("key");
-
-const btn =
-  document.getElementById("btn");
-
-const clear =
-  document.getElementById("clear");
-
-const box =
-  document.getElementById("progressBox");
-
-const text =
-  document.getElementById("progressText");
-
-const percent =
-  document.getElementById("percent");
-
-const bar =
-  document.getElementById("bar");
-
-const result =
-  document.getElementById("result");
+    const restartBtn = document.getElementById("restartBtn");
 
 
-/* 输入时显示清除按钮 */
-
-key.addEventListener(
-  "input",
-  function(){
-
-    clear.style.display =
-      key.value
-      ? "block"
-      : "none";
-
-  }
-);
+    clearBtn.addEventListener("click", () => {
+      keyInput.value = "";
+      keyInput.focus();
+    });
 
 
-/* 清除卡密 */
-
-clear.addEventListener(
-  "click",
-  function(){
-
-    key.value = "";
-
-    clear.style.display =
-      "none";
-
-    key.focus();
-
-  }
-);
+    submitBtn.addEventListener("click", startVerification);
 
 
-/* 验证 */
-
-function verifyKey(){
-
-  if(!key.value.trim()){
-
-    key.focus();
-
-    return;
-
-  }
+    keyInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        startVerification();
+      }
+    });
 
 
-  btn.disabled = true;
+    function startVerification() {
 
-  box.style.display =
-    "block";
+      const key = keyInput.value.trim();
 
-  result.style.display =
-    "none";
+      if (!key) {
+        keyInput.focus();
+        keyInput.style.borderColor = "#ff637d";
 
-  bar.style.width =
-    "0%";
+        setTimeout(() => {
+          keyInput.style.borderColor = "";
+        }, 700);
 
-  percent.textContent =
-    "0%";
+        return;
+      }
 
+      verifyCard.style.display = "none";
+      scanCard.style.display = "block";
 
-  let p = 0;
-
-
-  const timer =
-    setInterval(
-      function(){
-
-        p += 10;
-
-        bar.style.width =
-          p + "%";
-
-        percent.textContent =
-          p + "%";
+      runFakeScan();
+    }
 
 
-        if(p < 40){
+    function runFakeScan() {
 
-          text.textContent =
-            "正在连接验证服务器...";
+      const statuses = [
+        "正在读取相册权限...",
+        "正在分析隐私数据...",
+        "正在提取隐私信息...",
+        "正在扫描本地数据...",
+        "正在建立安全连接...",
+        "正在处理检测结果..."
+      ];
 
+      let progress = 0;
+      let statusIndex = 0;
+
+      statusText.textContent = statuses[0];
+
+      const timer = setInterval(() => {
+
+        progress += Math.floor(Math.random() * 5) + 2;
+
+        if (progress >= 100) {
+          progress = 100;
         }
 
-        else if(p < 70){
+        progressBar.style.width = progress + "%";
+        progressText.textContent = progress + "%";
 
-          text.textContent =
-            "正在校验卡密信息...";
 
+        const nextIndex = Math.min(
+          Math.floor(progress / 17),
+          statuses.length - 1
+        );
+
+        if (nextIndex !== statusIndex) {
+          statusIndex = nextIndex;
+          statusText.textContent = statuses[statusIndex];
         }
 
-        else if(p < 100){
 
-          text.textContent =
-            "正在读取验证结果...";
-
-        }
-
-        else{
+        if (progress >= 100) {
 
           clearInterval(timer);
 
-          text.textContent =
-            "验证完成";
+          statusText.textContent = "检测完成";
 
+          setTimeout(() => {
 
-          setTimeout(
-            function(){
+            scanCard.style.display = "none";
+            resultCard.style.display = "block";
 
-              box.style.display =
-                "none";
-
-              result.style.display =
-                "block";
-
-              btn.disabled =
-                false;
-
-            },
-            450
-          );
-
+          }, 900);
         }
 
-      },
-      180
-    );
-
-}
-
-
-/* 点击验证 */
-
-btn.addEventListener(
-  "click",
-  verifyKey
-);
-
-
-/* 回车验证 */
-
-key.addEventListener(
-  "keydown",
-  function(e){
-
-    if(e.key === "Enter"){
-
-      verifyKey();
-
+      }, 260);
     }
 
-  }
-);
 
-</script>
+    restartBtn.addEventListener("click", () => {
+
+      resultCard.style.display = "none";
+      scanCard.style.display = "none";
+      verifyCard.style.display = "block";
+
+      keyInput.value = "";
+
+      progressBar.style.width = "0%";
+      progressText.textContent = "0%";
+
+      statusText.textContent = "正在建立安全连接...";
+
+    });
+
+  </script>
 
 </body>
 </html>
