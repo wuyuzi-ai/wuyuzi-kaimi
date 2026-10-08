@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>无雨子卡密验证</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+  background:linear-gradient(135deg,#667eea,#764ba2);
+}
+.card{
+  width:100%;
+  max-width:430px;
+  padding:32px 24px;
+  border-radius:24px;
+  background:rgba(255,255,255,.96);
+  box-shadow:0 20px 60px rgba(0,0,0,.25);
+  text-align:center;
+}
+.logo{
+  width:72px;
+  height:72px;
+  margin:0 auto 16px;
+  border-radius:20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:36px;
+  background:linear-gradient(135deg,#667eea,#764ba2);
+}
+h1{
+  margin:0;
+  font-size:26px;
+  color:#222;
+}
+.desc{
+  margin:10px 0 24px;
+  color:#888;
+  font-size:14px;
+}
+.input{
+  width:100%;
+  height:52px;
+  padding:0 16px;
+  border:1px solid #ddd;
+  border-radius:13px;
+  outline:none;
+  font-size:16px;
+}
+.input:focus{
+  border-color:#667eea;
+  box-shadow:0 0 0 3px rgba(102,126,234,.12);
+}
+.btn{
+  width:100%;
+  height:52px;
+  margin-top:14px;
+  border:0;
+  border-radius:13px;
+  background:linear-gradient(135deg,#667eea,#764ba2);
+  color:white;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
+.btn:active{
+  transform:scale(.98);
+}
+.progress-box{
+  display:none;
+  margin-top:22px;
+}
+.progress-text{
+  color:#666;
+  font-size:13px;
+  margin-bottom:8px;
+}
+.progress{
+  height:8px;
+  border-radius:10px;
+  background:#eee;
+  overflow:hidden;
+}
+.bar{
+  height:100%;
+  width:0;
+  border-radius:10px;
+  background:linear-gradient(90deg,#667eea,#764ba2);
+  transition:width .35s;
+}
+.result{
+  display:none;
+  margin-top:22px;
+  padding:22px 15px;
+  border-radius:16px;
+  background:#fff4d6;
+  border:1px solid #ffe08a;
+}
+.result-icon{
+  font-size:42px;
+}
+.result-title{
+  margin-top:8px;
+  font-size:20px;
+  font-weight:bold;
+  color:#d48806;
+}
+.result-text{
+  margin-top:8px;
+  color:#666;
+  font-size:14px;
+}
+.footer{
+  margin-top:22px;
+  font-size:12px;
+  color:#aaa;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+  <div class="logo">🎫</div>
+
+  <h1>卡密验证</h1>
+
+  <div class="desc">
+    请输入卡密进行验证
+  </div>
+
+  <input
+    id="key"
+    class="input"
+    type="text"
+    placeholder="请输入你的卡密"
+    autocomplete="off"
+  >
+
+  <button class="btn" onclick="verifyKey()">
+    立即验证
+  </button>
+
+  <div id="progressBox" class="progress-box">
+    <div id="progressText" class="progress-text">
+      正在验证卡密...
+    </div>
+
+    <div class="progress">
+      <div id="bar" class="bar"></div>
+    </div>
+  </div>
+
+  <div id="result" class="result">
+
+    <div class="result-icon">😂</div>
+
+    <div class="result-title">
+      恭喜你！
+    </div>
+
+    <div class="result-text">
+      成功被骗了！
+    </div>
+
+  </div>
+
+  <div class="footer">
+    无雨子 · 卡密验证系统
+  </div>
+
+</div>
+
+<script>
+
+function verifyKey(){
+
+  const key = document.getElementById("key").value.trim();
+
+  if(!key){
+    alert("请输入卡密");
+    return;
+  }
+
+  const progressBox =
+    document.getElementById("progressBox");
+
+  const progressText =
+    document.getElementById("progressText");
+
+  const bar =
+    document.getElementById("bar");
+
+  const result =
+    document.getElementById("result");
+
+  result.style.display = "none";
+  progressBox.style.display = "block";
+  bar.style.width = "0%";
+
+  let progress = 0;
+
+  const timer = setInterval(function(){
+
+    progress += 10;
+
+    bar.style.width = progress + "%";
+
+    if(progress < 40){
+      progressText.innerText = "正在连接验证服务器...";
+    }else if(progress < 70){
+      progressText.innerText = "正在验证卡密...";
+    }else if(progress < 100){
+      progressText.innerText = "正在读取验证结果...";
+    }else{
+
+      clearInterval(timer);
+
+      progressText.innerText = "验证完成";
+
+      setTimeout(function(){
+
+        progressBox.style.display = "none";
+
+        result.style.display = "block";
+
+      },400);
+
+    }
+
+  },180);
+
+}
+
+document.getElementById("key").addEventListener(
+  "keydown",
+  function(event){
+
+    if(event.key === "Enter"){
+      verifyKey();
+    }
+
+  }
+);
+
+</script>
+
+</body>
+</html>
