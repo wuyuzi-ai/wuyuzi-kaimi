@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="zh-CN">
 <head>
@@ -51,7 +50,7 @@ h1{margin:0;font-size:28px}
 <div class="app">
 <header class="topbar">
   <div class="brand">
-<div class="logo"><img src="./c5f5bbfa75f015163e86377e19cea59.jpg" alt="无雨子商贸Logo"></div>
+    <div class="logo"><img src="./c5f5bbfa75f015163e86377e19cea59.jpg" alt="无雨子商贸Logo"></div>
     <div>
       <div class="brandname">无雨子商贸</div>
       <div class="sub">ADDRESS LIBRARY</div>
@@ -88,7 +87,7 @@ h1{margin:0;font-size:28px}
     <b>选择仓库</b>
     <div class="muted">请选择你需要使用的仓库分类</div>
   </div>
-  <span class="count">共 7 个分类</span>
+  <span class="count">共 4 个分类</span>
 </div>
 <section class="list" id="list"></section>
 <div class="tip">
@@ -117,14 +116,12 @@ const SUPABASE_KEY = 'sb_publishable_CEvTZ-09kGConsV3wlKxgA_OPS7knZE';
 
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// 仅显示当前要使用的四个仓库入口；未删除数据库中的其他仓库记录。
 const warehouses = [
   {name:'美妆仓',slug:'beauty',icon:'◇',desc:'美妆护肤类地址'},
-  {name:'保健仓',slug:'health',icon:'＋',desc:'保健及相关商品'},
   {name:'奶粉仓一',slug:'milk-1',icon:'○',desc:'奶粉仓库地址一'},
   {name:'奶粉仓二',slug:'milk-2',icon:'○',desc:'奶粉仓库地址二'},
-  {name:'数码仓',slug:'digital',icon:'▣',desc:'数码电子类地址'},
-  {name:'酒水仓',slug:'alcohol',icon:'◇',desc:'酒水类地址'},
-  {name:'其他仓',slug:'other',icon:'＋',desc:'其他分类地址'}
+  {name:'酒水仓',slug:'alcohol',icon:'◇',desc:'酒水类地址'}
 ];
 
 let current = null;
@@ -161,6 +158,7 @@ function openWarehouse(warehouse) {
   currentAddress = '';
   warehouseTitle.textContent = warehouse.name;
   result.textContent = '尚未获取地址\n点击下方按钮开始获取';
+  result.style.whiteSpace = 'pre-line';
   msg.textContent = '';
   copyButton.classList.add('hidden');
   home.classList.add('hidden');
@@ -201,21 +199,22 @@ getButton.addEventListener('click', async () => {
       return;
     }
 
-currentAddress = String(row.address);
+    currentAddress = String(row.address);
+    const recipient = String(row.recipient || '').trim();
+    const phone = String(row.phone || '').trim();
+    result.style.whiteSpace = 'pre-line';
 
-const recipient = row.recipient
-  ? String(row.recipient)
-  : '未填写';
+    // 有姓名或电话时显示联系信息；复制按钮仍只复制纯地址字符串。
+    if (recipient || phone) {
+      result.textContent =
+        `收件人：${recipient || '未填写'}\n` +
+        `联系电话：${phone || '未填写'}\n` +
+        `地址：${currentAddress}`;
+    } else {
+      result.textContent = currentAddress;
+    }
 
-const phone = row.phone
-  ? String(row.phone)
-  : '未填写';
-
-result.style.whiteSpace = 'pre-line';
-result.textContent =
-  `收件人：${recipient}\n联系电话：${phone}\n地址：${currentAddress}`;
-
-copyButton.classList.remove('hidden');
+    copyButton.classList.remove('hidden');
   } catch (error) {
     console.error('获取地址失败：', error);
     currentAddress = '';
