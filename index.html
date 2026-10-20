@@ -44,6 +44,13 @@ h1{margin:0;font-size:28px}
 .btn.secondary{background:#191919;border:1px solid #555;color:#fff}
 .msg{font-size:11px;line-height:1.8;margin-top:12px;color:#ddd}
 .hidden{display:none!important}
+.subtype-panel{margin-top:16px;padding:14px;border:1px solid #333;border-radius:14px;background:#101010}
+.subtype-heading{font-size:13px;font-weight:800}
+.subtype-list{display:grid;gap:10px;margin-top:12px}
+.subtype-button{width:100%;text-align:left;padding:13px;border:1px solid #383838;border-radius:12px;background:#151515;color:#f5f5f5;cursor:pointer}
+.subtype-button.active{border-color:#eee;background:#242424}
+.subtype-button strong{display:block;font-size:13px;font-weight:800}
+.subtype-button small{display:block;margin-top:5px;color:#999;font-size:10px;line-height:1.7}
 </style>
 </head>
 <body>
@@ -100,8 +107,26 @@ h1{margin:0;font-size:28px}
   <button class="back" id="back">← 返回仓库列表</button>
   <div class="muted">WAREHOUSE / ADDRESS</div>
   <div class="title" id="warehouseTitle"></div>
-  <div class="muted">点击下方按钮，从当前仓库随机获取一条地址。</div>
-  <div class="result" id="result">尚未获取地址<br>点击下方按钮开始获取</div>
+  <div class="muted" id="detailHint">点击下方按钮，从当前仓库随机获取一条地址。</div>
+  <section class="subtype-panel hidden" id="subtypePanel">
+    <div class="subtype-heading">请选择美妆仓地址类型</div>
+    <div class="subtype-list" id="subtypeList">
+      <button class="subtype-button" type="button" data-address-type="common">
+        <strong>京东、顺丰通用地址</strong>
+        <small>此分类仅抽取标记为通用的地址。</small>
+      </button>
+      <button class="subtype-button" type="button" data-address-type="jd_only">
+        <strong>京东直下地址（仅限京东）</strong>
+        <small>仅适用于已经确认可用于京东的地址。</small>
+      </button>
+      <button class="subtype-button" type="button" data-address-type="sf_only">
+        <strong>顺丰直下地址（一般用于唯品会直下）</strong>
+        <small>请以订单实际承运快递和收货信息为准。</small>
+      </button>
+    </div>
+  </section>
+  <div class="result" id="result">尚未获取地址
+点击下方按钮开始获取</div>
   <button class="btn" id="get">摇一个随机地址</button>
   <button class="btn secondary hidden" id="copy">一键复制地址</button>
   <div class="msg" id="msg"></div>
@@ -126,11 +151,19 @@ const warehouses = [
 
 let current = null;
 let currentAddress = '';
+let currentAddressType = null;
+const beautyTypeNames = {
+  common: '京东、顺丰通用地址',
+  jd_only: '京东直下地址（仅限京东）',
+  sf_only: '顺丰直下地址（一般用于唯品会直下）'
+};
 
 const list = document.getElementById('list');
 const home = document.getElementById('home');
 const detail = document.getElementById('detail');
 const warehouseTitle = document.getElementById('warehouseTitle');
+const detailHint = document.getElementById('detailHint');
+const subtypePanel = document.getElementById('subtypePanel');
 const result = document.getElementById('result');
 const getButton = document.getElementById('get');
 const copyButton = document.getElementById('copy');
@@ -156,21 +189,51 @@ function renderWarehouses() {
 function openWarehouse(warehouse) {
   current = warehouse;
   currentAddress = '';
+  currentAddressType = null;
   warehouseTitle.textContent = warehouse.name;
   result.textContent = '尚未获取地址\n点击下方按钮开始获取';
   result.style.whiteSpace = 'pre-line';
   msg.textContent = '';
   copyButton.classList.add('hidden');
+
+  const isBeauty = warehouse.slug === 'beauty';
+  subtypePanel.classList.toggle('hidden', !isBeauty);
+  getButton.classList.toggle('hidden', isBeauty);
+  detailHint.textContent = isBeauty
+    ? '请先选择地址类型，再随机获取该类型的地址。'
+    : '点击下方按钮，从当前仓库随机获取一条地址。';
+  document.querySelectorAll('[data-address-type]').forEach(button => {
+    button.classList.remove('active');
+  });
+
   home.classList.add('hidden');
   detail.style.display = 'block';
   window.scrollTo({top: 0, behavior: 'smooth'});
 }
+
+// 美妆仓先选择地址类型，再调用对应分类的随机抽取函数。
+document.querySelectorAll('[data-address-type]').forEach(button => {
+  button.addEventListener('click', () => {
+    if (!current || current.slug !== 'beauty') return;
+    currentAddressType = button.dataset.addressType;
+    currentAddress = '';
+    document.querySelectorAll('[data-address-type]').forEach(item => {
+      item.classList.toggle('active', item === button);
+    });
+    result.textContent = `已选择：${beautyTypeNames[currentAddressType]}\n点击下方按钮开始获取`;
+    result.style.whiteSpace = 'pre-line';
+    msg.textContent = '';
+    copyButton.classList.add('hidden');
+    getButton.classList.remove('hidden');
+  });
+});
 
 document.getElementById('back').addEventListener('click', () => {
   detail.style.display = 'none';
   home.classList.remove('hidden');
   current = null;
   currentAddress = '';
+  currentAddressType = null;
   window.scrollTo({top: 0, behavior: 'smooth'});
 });
 
@@ -183,19 +246,31 @@ getButton.addEventListener('click', async () => {
   copyButton.classList.add('hidden');
 
   try {
-    const { data, error } = await db.rpc(
-      'get_random_warehouse_address',
-      { p_warehouse_slug: current.slug }
-    );
+    if (current.slug === 'beauty' && !currentAddressType) {
+      msg.textContent = '请先选择美妆仓地址类型。';
+      return;
+    }
 
+    const response = current.slug === 'beauty'
+      ? await db.rpc('get_random_warehouse_address_by_type', {
+          p_warehouse_slug: current.slug,
+          p_address_type: currentAddressType
+        })
+      : await db.rpc('get_random_warehouse_address', {
+          p_warehouse_slug: current.slug
+        });
+
+    const { data, error } = response;
     if (error) throw error;
 
     const row = Array.isArray(data) ? data[0] : data;
 
     if (!row || !row.address) {
       currentAddress = '';
-      result.textContent = '当前仓库暂无可用地址';
-      msg.textContent = '请联系管理员检查该仓库的地址数据。';
+      result.textContent = '当前分类暂无可用地址';
+      msg.textContent = current.slug === 'beauty'
+        ? `“${beautyTypeNames[currentAddressType]}”目前还没有可用记录，请先添加该分类的地址。`
+        : '请联系管理员检查该仓库的地址数据。';
       return;
     }
 
