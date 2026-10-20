@@ -201,9 +201,21 @@ getButton.addEventListener('click', async () => {
       return;
     }
 
-    currentAddress = String(row.address);
-    result.textContent = currentAddress;
-    copyButton.classList.remove('hidden');
+currentAddress = String(row.address);
+
+const recipient = row.recipient
+  ? String(row.recipient)
+  : '未填写';
+
+const phone = row.phone
+  ? String(row.phone)
+  : '未填写';
+
+result.style.whiteSpace = 'pre-line';
+result.textContent =
+  `收件人：${recipient}\n联系电话：${phone}\n地址：${currentAddress}`;
+
+copyButton.classList.remove('hidden');
   } catch (error) {
     console.error('获取地址失败：', error);
     currentAddress = '';
